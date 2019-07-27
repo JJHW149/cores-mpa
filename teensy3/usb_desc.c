@@ -68,7 +68,11 @@
 static uint8_t device_descriptor[] = {
         18,                                     // bLength
         1,                                      // bDescriptorType
+#ifdef BCD_USB
+        LSB(BCD_USB), MSB(BCD_USB),
+#else
         0x10, 0x01,                             // bcdUSB
+#endif
 #ifdef DEVICE_CLASS
         DEVICE_CLASS,                           // bDeviceClass
 #else
@@ -109,7 +113,7 @@ static uint8_t device_descriptor[] = {
 #endif
         1,                                      // iManufacturer
         2,                                      // iProduct
-        3,                                      // iSerialNumber
+        0,                                      // iSerialNumber
         1                                       // bNumConfigurations
 };
 
@@ -350,6 +354,76 @@ static uint8_t joystick_report_desc[] = {
 #endif // JOYSTICK_SIZE
 #endif // JOYSTICK_INTERFACE
 
+#ifdef MPA_INTERFACE
+static uint8_t mpa_report_desc[] = {
+    0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+    0x09, 0x05,        // Usage (Game Pad)
+    0xA1, 0x01,        // Collection (Application)
+    0x15, 0x00,        //   Logical Minimum (0)
+    0x25, 0x01,        //   Logical Maximum (1)
+    0x35, 0x00,        //   Physical Minimum (0)
+    0x45, 0x01,        //   Physical Maximum (1)
+    0x75, 0x01,        //   Report Size (1)
+    0x95, 0x0D,        //   Report Count (13)
+    0x05, 0x09,        //   Usage Page (Button)
+    0x19, 0x01,        //   Usage Minimum (0x01)
+    0x29, 0x0D,        //   Usage Maximum (0x0D)
+    0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x95, 0x03,        //   Report Count (3)
+    0x81, 0x01,        //   Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x05, 0x01,        //   Usage Page (Generic Desktop Ctrls)
+    0x25, 0x07,        //   Logical Maximum (7)
+    0x46, 0x3B, 0x01,  //   Physical Maximum (315)
+    0x75, 0x04,        //   Report Size (4)
+    0x95, 0x01,        //   Report Count (1)
+    0x65, 0x14,        //   Unit (System: English Rotation, Length: Centimeter)
+    0x09, 0x39,        //   Usage (Hat switch)
+    0x81, 0x42,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,Null State)
+    0x65, 0x00,        //   Unit (None)
+    0x95, 0x01,        //   Report Count (1)
+    0x81, 0x01,        //   Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+    0x46, 0xFF, 0x00,  //   Physical Maximum (255)
+    0x09, 0x30,        //   Usage (X)
+    0x09, 0x31,        //   Usage (Y)
+    0x09, 0x32,        //   Usage (Z)
+    0x09, 0x35,        //   Usage (Rz)
+    0x75, 0x08,        //   Report Size (8)
+    0x95, 0x04,        //   Report Count (4)
+    0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x06, 0x00, 0xFF,  //   Usage Page (Vendor Defined 0xFF00)
+    0x09, 0x20,        //   Usage (0x20)
+    0x09, 0x21,        //   Usage (0x21)
+    0x09, 0x22,        //   Usage (0x22)
+    0x09, 0x23,        //   Usage (0x23)
+    0x09, 0x24,        //   Usage (0x24)
+    0x09, 0x25,        //   Usage (0x25)
+    0x09, 0x26,        //   Usage (0x26)
+    0x09, 0x27,        //   Usage (0x27)
+    0x09, 0x28,        //   Usage (0x28)
+    0x09, 0x29,        //   Usage (0x29)
+    0x09, 0x2A,        //   Usage (0x2A)
+    0x09, 0x2B,        //   Usage (0x2B)
+    0x95, 0x0C,        //   Report Count (12)
+    0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0x0A, 0x21, 0x26,  //   Usage (0x2621)
+    0x95, 0x08,        //   Report Count (8)
+    0xB1, 0x02,        //   Feature (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0x0A, 0x21, 0x26,  //   Usage (0x2621)
+    0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    0x26, 0xFF, 0x03,  //   Logical Maximum (1023)
+    0x46, 0xFF, 0x03,  //   Physical Maximum (1023)
+    0x09, 0x2C,        //   Usage (0x2C)
+    0x09, 0x2D,        //   Usage (0x2D)
+    0x09, 0x2E,        //   Usage (0x2E)
+    0x09, 0x2F,        //   Usage (0x2F)
+    0x75, 0x10,        //   Report Size (16)
+    0x95, 0x04,        //   Report Count (4)
+    0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    0xC0               // End Collection
+};
+#endif // MPA_INTERFACE
+
 #ifdef MULTITOUCH_INTERFACE
 // https://forum.pjrc.com/threads/32331-USB-HID-Touchscreen-support-needed
 // https://msdn.microsoft.com/en-us/library/windows/hardware/jj151563%28v=vs.85%29.aspx
@@ -572,8 +646,9 @@ static uint8_t flightsim_report_desc[] = {
 #define MULTITOUCH_INTERFACE_DESC_SIZE	0
 #endif
 
+#ifndef MPA_INTERFACE
 #define CONFIG_DESC_SIZE		MULTITOUCH_INTERFACE_DESC_POS+MULTITOUCH_INTERFACE_DESC_SIZE
-
+#endif
 
 
 // **************************************************************
@@ -591,8 +666,12 @@ static uint8_t config_descriptor[CONFIG_DESC_SIZE] = {
         NUM_INTERFACE,                          // bNumInterfaces
         1,                                      // bConfigurationValue
         0,                                      // iConfiguration
+        /* Replacing these with the values observed from my MadCatz MPA
         0xC0,                                   // bmAttributes
         50,                                     // bMaxPower
+        */
+        0x80,
+        0x20,
 
 #ifdef CDC_IAD_DESCRIPTOR
         // interface association descriptor, USB ECN, Table 9-Z
@@ -1091,6 +1170,41 @@ static uint8_t config_descriptor[CONFIG_DESC_SIZE] = {
         JOYSTICK_INTERVAL,                      // bInterval
 #endif // JOYSTICK_INTERFACE
 
+#ifdef MPA_INTERFACE
+        // interface descriptor, USB spec 9.6.5, page 267-269, Table 9-12
+        9,                                    // bLength
+        4,                                    // bDescriptorType
+        MPA_INTERFACE,                        // bInterfaceNumber
+        0,                                    // bAlternateSetting
+        2,                                    // bNumEndpoints
+        0x03,                                 // bInterfaceClass (0x03 = HID)
+        0x00,                                 // bInterfaceSubClass
+        0x00,                                 // bInterfaceProtocol
+        0,                                    // iInterface
+        // HID interface descriptor, HID 1.11 spec, section 6.2.1
+        9,                                    // bLength
+        0x21,                                 // bDescriptorType
+        0x11, 0x01,                           // bcdHID
+        0,                                    // bCountryCode
+        1,                                    // bNumDescriptors
+        0x22,                                 // bDescriptorType
+        LSB(sizeof(mpa_report_desc)),         // wDescriptorLength
+        MSB(sizeof(mpa_report_desc)),
+        // endpoint descriptor, USB spec 9.6.6, page 269-271, Table 9-13
+        7,                                    // bLength
+        5,                                    // bDescriptorType
+        MPA_ENDPOINT | 0x80,                  // bEndpointAddress
+        0x03,                                 // bmAttributes (0x03=intr)
+        MPA_MAX_SIZE, 0,                      // wMaxPacketSize
+        MPA_INTERVAL,                         // bInterval
+        7,                                    // bLength
+        5,                                    // bDescriptorType
+        0x02,                                 // bEndpointAddress
+        0x03,                                 // bmAttributes (0x03=intr)
+        MPA_MAX_SIZE, 0,                      // wMaxPacketSize
+        MPA_INTERVAL,                         // bInterval
+#endif // MPA_INTERFACE
+
 #ifdef MTP_INTERFACE
         // interface descriptor, USB spec 9.6.5, page 267-269, Table 9-12
         9,                                      // bLength
@@ -1516,6 +1630,12 @@ const usb_descriptor_list_t usb_descriptor_list[] = {
 #ifdef JOYSTICK_INTERFACE
         {0x2200, JOYSTICK_INTERFACE, joystick_report_desc, sizeof(joystick_report_desc)},
         {0x2100, JOYSTICK_INTERFACE, config_descriptor+JOYSTICK_HID_DESC_OFFSET, 9},
+#endif
+#ifdef MPA_INTERFACE
+        {0x2200, MPA_INTERFACE, mpa_report_desc, sizeof(mpa_report_desc)},
+        {0x2100, MPA_INTERFACE, config_descriptor + MPA_DESC_OFFSET, 9},
+        // required for mysterious reasons
+        {0x0301, 0x0048, (const uint8_t *)&usb_string_manufacturer_name, 0},
 #endif
 #ifdef RAWHID_INTERFACE
 	{0x2200, RAWHID_INTERFACE, rawhid_report_desc, sizeof(rawhid_report_desc)},

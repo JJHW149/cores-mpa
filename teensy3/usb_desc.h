@@ -173,6 +173,32 @@ let me know?  http://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports
   #define ENDPOINT5_CONFIG	ENDPOINT_TRANSMIT_ONLY
   #define ENDPOINT6_CONFIG	ENDPOINT_TRANSMIT_ONLY
 
+#elif defined(USB_MPA)
+  #define VENDOR_ID             0x12BA
+  #define PRODUCT_ID            0x0218
+  #define MANUFACTURER_NAME     {'L', 'i', 'c', 'e', 'n', 's', 'e', 'd', ' ', 'b', 'y', ' ', 'S', 'o', 'n', 'y', ' ', 'C', 'o', 'm', 'p', 'u', 't', 'e', 'r', ' ', 'E', 'n', 't', 'e', 'r', 't', 'a', 'i', 'n', 'm', 'e', 'n', 't', ' ', 'A', 'm', 'e', 'r', 'i', 'c', 'a'}
+  #define MANUFACTURER_NAME_LEN 47
+  #define PRODUCT_NAME          {'H', 'a', 'r', 'm', 'o', 'n', 'i', 'x', ' ', 'D', 'r', 'u', 'm', ' ', 'k', 'i', 't', ' ', 'f', 'o', 'r', ' ', 'P', 'l', 'a', 'y', 'S', 't', 'a', 't', 'i', 'o', 'n', 0xae, '3'}
+  #define PRODUCT_NAME_LEN      35
+  #define DEVICE_CLASS          0x00
+  #define DEVICE_SUBCLASS       0x00
+  #define DEVICE_PROTOCOL       0x00
+  #define BCD_DEVICE            0x0200
+  #define BCD_USB               0x0200
+  #define EP0_SIZE              16
+  #define NUM_ENDPOINTS         2
+  #define NUM_USB_BUFFERS       30
+  #define NUM_INTERFACE         1
+  #define MPA_INTERFACE         0 // Midi Pro Adapter
+  #define MPA_ENDPOINT          1
+  #define MPA_PACK_SIZE         0x1B
+  #define MPA_MAX_SIZE          0x40
+  #define MPA_INTERVAL          0x01 // 0xA on the stock adapter
+  #define MPA_DESC_OFFSET       (9)
+  #define CONFIG_DESC_SIZE      (9+9+9+7+7)
+  #define ENDPOINT1_CONFIG      ENDPOINT_TRANSMIT_ONLY
+  #define ENDPOINT2_CONFIG      ENDPOINT_RECEIVE_ONLY
+
 #elif defined(USB_HID)
   #define VENDOR_ID		0x16C0
   #define PRODUCT_ID		0x0482
