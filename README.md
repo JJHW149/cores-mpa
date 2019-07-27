@@ -1,5 +1,9 @@
-Teensy 2.0, 3.x, LC core libraries for Arduino.
+Fork of the Teensy 2.0, 3.x, LC core libraries for Arduino.
 
-The latest stable version of Teensy's core library is always available in the Teensyduino installer, at this page:
+Note - you will also need to modify boards.txt (outside of the cores folder) to use the new USBType defined by this patch, add 
 
-http://www.pjrc.com/teensy/td_download.html
++teensy36.menu.usb.mpa=MPA
++teensy36.menu.usb.mpa.build.usbtype=USB_MPA
++teensy36.menu.usb.mpa.fake_serial=teensy_gateway
+
+More information: http://progsoc.org/~curious/rock_band/diy_midi_pro_adapter2.html
