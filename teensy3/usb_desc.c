@@ -424,6 +424,35 @@ static uint8_t mpa_report_desc[] = {
 };
 #endif // MPA_INTERFACE
 
+#ifdef RBGTR_INTERFACE
+static uint8_t rbgtr_report_desc[] = {
+    0x05, 0x01,                 // USAGE_PAGE (Generic Desktop)
+    0x09, 0x04,                 // USAGE (Joystick)
+    0xa1, 0x01,                 // COLLECTION (Application)
+    0x09, 0x04,                 //   USAGE (Joystick)
+    0xa1, 0x00,                 //   COLLECTION (Physical)
+    0x09, 0x30,                 //   USAGE (X)
+    0x09, 0x31,                 //   USAGE (Y)
+    0x09, 0x33,                 //   USAGE (Rx)
+    0x09, 0x34,                 //   USAGE (Ry)
+    0x75, 0x08,                 //   REPORT_SIZE (8)
+    0x95, 0x04,                 //   REPORT_COUNT (4)
+    0x45, 0x7f,                 //   PHYSICAL_MAXIMUM (127)
+    0x35, 0x81,                 //   PHYSICAL_MINIMUM (-127)
+    0x81, 0x02,                 //   INPUT (Data,Var,Abs)
+    0x05, 0x09,                 //   USAGE_PAGE (Button)
+    0x19, 0x01,                 //   USAGE_MINIMUM (Button 1)
+    0x29, 0x10,                 //   USAGE_MAXIMUM (Button 16)
+    0x15, 0x00,                 //   LOGICAL_MINIMUM (0)
+    0x25, 0x01,                 //   LOGICAL_MAXIMUM (1)
+    0x75, 0x01,                 //   REPORT_SIZE (1)
+    0x95, 0x10,                 //   REPORT_COUNT (16)
+    0x81, 0x02,                 //   INPUT (Data,Var,Abs)
+    0xc0,                       //   END_COLLECTION
+    0xc0                        // END_COLLECTION
+};
+#endif
+
 #ifdef MULTITOUCH_INTERFACE
 // https://forum.pjrc.com/threads/32331-USB-HID-Touchscreen-support-needed
 // https://msdn.microsoft.com/en-us/library/windows/hardware/jj151563%28v=vs.85%29.aspx
@@ -1204,6 +1233,64 @@ static uint8_t config_descriptor[CONFIG_DESC_SIZE] = {
         MPA_MAX_SIZE, 0,                      // wMaxPacketSize
         MPA_INTERVAL,                         // bInterval
 #endif // MPA_INTERFACE
+        
+#ifdef GTR_INTERFACE
+        // interface descriptor, USB spec 9.6.5, page 267-269, Table 9-12
+        9,                                    // bLength
+        4,                                    // bDescriptorType
+        GTR_INTERFACE,                    // bInterfaceNumber
+        0,                                    // bAlternateSetting
+        1,                                    // bNumEndpoints
+        0x03,                                  // bInterfaceClass (0x03 = HID)
+        0x00,                                  // bInterfaceSubClass
+        0x00,                                  // bInterfaceProtocol
+        0,                                    // iInterface
+        // HID interface descriptor, HID 1.11 spec, section 6.2.1
+        9,                                    // bLength
+        0x21,                                  // bDescriptorType
+        0x11, 0x01,                          // bcdHID
+        0,                                    // bCountryCode
+        1,                                    // bNumDescriptors
+        0x22,                                  // bDescriptorType
+        LSB(sizeof(gtr_report_desc)),        // wDescriptorLength
+        MSB(sizeof(gtr_report_desc)),
+        // endpoint descriptor, USB spec 9.6.6, page 269-271, Table 9-13
+        7,                                    // bLength
+        5,                                    // bDescriptorType
+        GTR_ENDPOINT | 0x80,            // bEndpointAddress
+        0x03,                                  // bmAttributes (0x03=intr)
+        GTR_MAX_SIZE, 0,                    // wMaxPacketSize
+        GTR_INTERVAL,                      // bInterval
+#endif // GTR_INTERFACE
+
+#ifdef RBGTR_INTERFACE
+        // interface descriptor, USB spec 9.6.5, page 267-269, Table 9-12
+        9,                                    // bLength
+        4,                                    // bDescriptorType
+        RBGTR_INTERFACE,                    // bInterfaceNumber
+        0,                                    // bAlternateSetting
+        1,                                    // bNumEndpoints
+        0x03,                                  // bInterfaceClass (0x03 = HID)
+        0x00,                                  // bInterfaceSubClass
+        0x00,                                  // bInterfaceProtocol
+        0,                                    // iInterface
+        // HID interface descriptor, HID 1.11 spec, section 6.2.1
+        9,                                    // bLength
+        0x21,                                  // bDescriptorType
+        0x11, 0x01,                          // bcdHID
+        0,                                    // bCountryCode
+        1,                                    // bNumDescriptors
+        0x22,                                  // bDescriptorType
+        LSB(sizeof(rbgtr_report_desc)),        // wDescriptorLength
+        MSB(sizeof(rbgtr_report_desc)),
+        // endpoint descriptor, USB spec 9.6.6, page 269-271, Table 9-13
+        7,                                    // bLength
+        5,                                    // bDescriptorType
+        RBGTR_ENDPOINT | 0x80,            // bEndpointAddress
+        0x03,                                  // bmAttributes (0x03=intr)
+        RBGTR_MAX_SIZE, 0,                    // wMaxPacketSize
+        RBGTR_INTERVAL,                      // bInterval
+#endif // RBGTR_INTERFACE
 
 #ifdef MTP_INTERFACE
         // interface descriptor, USB spec 9.6.5, page 267-269, Table 9-12
@@ -1637,6 +1724,18 @@ const usb_descriptor_list_t usb_descriptor_list[] = {
         // required for mysterious reasons
         {0x0301, 0x0048, (const uint8_t *)&usb_string_manufacturer_name, 0},
 #endif
+#ifdef GTR_INTERFACE
+        {0x2200, GTR_INTERFACE, gtr_report_desc, sizeof(gtr_report_desc)},
+        {0x2100, GTR_INTERFACE, config_descriptor + GTR_DESC_OFFSET, 9},
+        // required for mysterious reasons
+        {0x0301, 0x0048, (const uint8_t *)&usb_string_manufacturer_name, 0},
+#endif
+
+#ifdef RBGTR_INTERFACE
+        {0x2200, RBGTR_INTERFACE, rbgtr_report_desc, sizeof(rbgtr_report_desc)},
+        {0x2100, RBGTR_INTERFACE, config_descriptor+RBGTR_DESC_OFFSET, 9},
+#endif
+
 #ifdef RAWHID_INTERFACE
 	{0x2200, RAWHID_INTERFACE, rawhid_report_desc, sizeof(rawhid_report_desc)},
 	{0x2100, RAWHID_INTERFACE, config_descriptor+RAWHID_HID_DESC_OFFSET, 9},

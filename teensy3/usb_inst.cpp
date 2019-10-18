@@ -72,6 +72,11 @@ uint8_t usb_joystick_class::manual_mode = 0;
 usb_serial_class Serial;
 #endif
 
+#ifdef GTR_INTERFACE
+usb_gtr_class GTR;
+uint8_t usb_gtr_class::auto_send = 0;
+#endif
+
 
 #else // F_CPU < 20 MHz
 
